@@ -104,7 +104,7 @@ def find_duplicates(files):
     for k1, g1 in itertools.groupby(files, kf1):
         g1 = list(g1)
         # different files with same size
-        if (len(g1) == 1):
+        if len(g1) == 1:
             continue
 
         dupl = []
@@ -114,7 +114,7 @@ def find_duplicates(files):
         # different files with the same hash
         for k2, g2 in itertools.groupby(g1, kf2):
             g2 = list(g2)
-            if (len(g2) == 1):
+            if len(g2) == 1:
                 continue
 
             handle_duplicates(g2)
