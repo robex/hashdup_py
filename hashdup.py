@@ -21,6 +21,7 @@ def parse_args():
     parser.add_argument("-r", help = "recursive, check files from all subdirectories", action = "store_true")
     parser.add_argument("-i", help = "prompt for deletion of duplicate files", action = "store_true")
     parser.add_argument("-a", metavar = "algorithm", type = str, help = "hashing algorithm to use (xxhash, sha1, sha256), default sha1")
+    parser.add_argument("--ad", "--auto-delete", metavar = "number", type = str, help = "WARNING! automatically delete specified duplicate files ('number' is what you would type manually with -i) ")
     parser.add_argument("path", help = "path to check")
 
     args = parser.parse_args()
@@ -75,10 +76,15 @@ def handle_duplicates(dupl):
     for i, f in enumerate(dupl):
         print("(" + str(i) + ") [" + f.hash[0:8] + "] " + "size: " + str(f.size) + " B, '" + f.fname + "'")
 
-    if not g_args.i:
+    if not g_args.i and not g_args.ad:
         print()
     else:
-        fdel = input("select files to delete (0-" + str(ndup - 1) + "/q), default q: ")
+        fdel = ""
+        if g_args.ad:
+            fdel = g_args.ad
+        else:
+            fdel = input("select files to delete (0-" + str(ndup - 1) + "/q), default q: ")
+
         if fdel == "q" or fdel == "":
             print()
             return
