@@ -9,8 +9,8 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -r                    recursive, check files from all subdirectories
-  -i                    prompt for deletion of duplicate files
+  -r, --recurse         recursive, check files from all subdirectories
+  -i, --interactive     prompt for deletion of duplicate files
   -a algorithm          hashing algorithm to use (xxhash, sha1, sha256), default sha1
   -q, --quick-hash      hash only a small percentage of the file. WARNING: doesn't guarantee the files are exactly
                         equal!

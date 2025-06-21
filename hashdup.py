@@ -19,11 +19,11 @@ class HFile:
 
 def parse_args():
     parser = argparse.ArgumentParser(description = "duplicate file checker - by /robex/")
-    parser.add_argument("-r", help = "recursive, check files from all subdirectories", action = "store_true")
-    parser.add_argument("-i", help = "prompt for deletion of duplicate files", action = "store_true")
+    parser.add_argument("-r", "--recurse", help = "recursive, check files from all subdirectories", action = "store_true")
+    parser.add_argument("-i", "--interactive", help = "prompt for deletion of duplicate files", action = "store_true")
     parser.add_argument("-a", metavar = "algorithm", type = str, help = "hashing algorithm to use (xxhash, sha1, sha256), default sha1")
     parser.add_argument("-q", "--quick-hash", help = "hash only a small percentage of the file. WARNING: doesn't guarantee the files are exactly equal!", action = "store_true")
-    parser.add_argument("--ad", "--auto-delete", metavar = "number", type = str, help = "WARNING! automatically delete specified duplicate files ('number' is what you would type manually with -i) ")
+    parser.add_argument("--ad", "--auto-delete", metavar = "number", type = str, help = "WARNING: automatically delete specified duplicate files ('number' is what you would type manually with -i) ")
     parser.add_argument("path", help = "path to check")
 
     args = parser.parse_args()
