@@ -49,7 +49,7 @@ def get_file_list():
             f = HFile(p)
             f.size = os.path.getsize(p)
             hfiles.append(f)
-        if not g_args.r:
+        if not g_args.recurse:
             break
             
     sort_file_list(hfiles)
@@ -93,7 +93,7 @@ def handle_duplicates(dupl):
     for i, f in enumerate(dupl):
         print("(" + str(i) + ") [" + f.hash[0:8] + "] " + "size: " + str(f.size) + " B, '" + f.fname + "'")
 
-    if not g_args.i and not g_args.ad:
+    if not g_args.interactive and not g_args.ad:
         print()
     else:
         fdel = ""
