@@ -7,6 +7,7 @@ import itertools
 import hashlib
 import xxhash
 
+CHUNKSZ = 2**20
 g_args = None
 
 class HFile:
@@ -21,6 +22,7 @@ def parse_args():
     parser.add_argument("-r", help = "recursive, check files from all subdirectories", action = "store_true")
     parser.add_argument("-i", help = "prompt for deletion of duplicate files", action = "store_true")
     parser.add_argument("-a", metavar = "algorithm", type = str, help = "hashing algorithm to use (xxhash, sha1, sha256), default sha1")
+    parser.add_argument("-q", "--quick-hash", help = "hash only a small percentage of the file. WARNING: doesn't guarantee the files are exactly equal!", action = "store_true")
     parser.add_argument("--ad", "--auto-delete", metavar = "number", type = str, help = "WARNING! automatically delete specified duplicate files ('number' is what you would type manually with -i) ")
     parser.add_argument("path", help = "path to check")
 
@@ -55,7 +57,7 @@ def get_file_list():
 
     return hfiles
 
-def calc_hash(fname):
+def calc_hash(fobj):
     hash_obj = hashlib.sha1() 
 
     if g_args.a == "sha1":
@@ -65,10 +67,25 @@ def calc_hash(fname):
     elif g_args.a == "xxhash":
         hash_obj = xxhash.xxh3_64()
 
-    with open(fname, "rb") as f:
-        for chunk in iter(lambda: f.read(8192), b""):
+    with open(fobj.fname, "rb") as f:
+        if g_args.quick_hash and fobj.size > CHUNKSZ * 3:
+            # beginning of file
+            chunk = f.read(CHUNKSZ)
             hash_obj.update(chunk)
-            
+
+            # middle of file
+            f.seek(fobj.size // 2 - CHUNKSZ // 2)
+            chunk = f.read(CHUNKSZ)
+            hash_obj.update(chunk)
+
+            # end of file
+            f.seek(fobj.size - CHUNKSZ)
+            chunk = f.read(CHUNKSZ)
+            hash_obj.update(chunk)
+        else:
+            for chunk in iter(lambda: f.read(8192), b""):
+                hash_obj.update(chunk)
+
     return hash_obj.hexdigest().lower()
 
 def handle_duplicates(dupl):
@@ -113,9 +130,8 @@ def find_duplicates(files):
         if len(g1) == 1:
             continue
 
-        dupl = []
         for f in g1:
-            f.hash = calc_hash(f.fname)
+            f.hash = calc_hash(f)
 
         # different files with the same hash
         for k2, g2 in itertools.groupby(g1, kf2):
